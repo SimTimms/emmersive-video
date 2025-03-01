@@ -1,6 +1,5 @@
 import { OrbitControls } from "@react-three/drei";
-import React, { useRef } from "react";
-import { Perf } from "r3f-perf";
+import { useRef } from "react";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { useLoader, useThree, useFrame } from "@react-three/fiber";
 import {
@@ -21,6 +20,7 @@ function Scene() {
   carModel.scene.traverse(function (node) {
     if (node.name === "headlights") {
       headlightsRef.current = node;
+      //@ts-ignore
       node.material = new THREE.MeshStandardMaterial({
         color: 0x000000,
         emissive: 0xffffff,
@@ -29,6 +29,7 @@ function Scene() {
     }
     if (node.name === "brakelight") {
       brakelightsRef.current = node;
+      //@ts-ignore
       node.material = new THREE.MeshStandardMaterial({
         color: 0x000000,
         emissive: 0xff0000,
@@ -55,7 +56,7 @@ function Scene() {
       brakelightsRef.current.material.emissiveIntensity = 10;
     },
   };
-  useFrame(({ clock }, delta) => {
+  useFrame(({ clock }) => {
     if (!camera) {
       return;
     }
