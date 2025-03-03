@@ -14,7 +14,7 @@ import * as THREE from "three";
 
 interface SceneProps {
   video: HTMLVideoElement | null;
-  path: any[] | null;
+  path: THREE.Vector3[];
   setSceneNbr: any;
   sceneNbr: number;
 }
@@ -26,6 +26,7 @@ function Scene(props: SceneProps) {
   const camera = useThree((state: any) => state.camera);
   const headlightsRef = useRef<any>(null);
   const brakelightsRef = useRef<any>(null);
+  const [carColour, setCarColour] = useState<any>("hsl(0, 0%, 100%)");
 
   carModel.scene.traverse(function (node) {
     if (node.name === "headlights") {
@@ -37,7 +38,7 @@ function Scene(props: SceneProps) {
       });
     }
     if (node.name === "chassis" && node instanceof THREE.Mesh) {
-      node.material.color.set(0xf2a407);
+      node.material.color.set(carColour);
       node.material.roughness = 1.2;
       node.material.metalness = 0.8;
     }
@@ -79,8 +80,10 @@ function Scene(props: SceneProps) {
 
     const curve = new THREE.CatmullRomCurve3(path, false, "catmullrom", 0.1);
 
+    setCarColour(
+      `hsl(${(Math.sin(elapsedTime * 0.2) * 180 + 180) % 360}, 100%, 50%)`
+    );
     if (video) {
-      console.log(video.currentTime / video.duration);
       if (video.currentTime / video.duration >= 1 && sceneNbr === 0) {
         setSceneNbr(1);
       }

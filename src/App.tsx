@@ -39,12 +39,14 @@ function App() {
         camera={{ fov: 35, position: [0, 0, 4], far: 400 }}
         shadows
       >
-        <Scene
-          video={videoState}
-          path={path}
-          setSceneNbr={setSceneNbr}
-          sceneNbr={sceneNbr}
-        />
+        {path && (
+          <Scene
+            video={videoState}
+            path={path}
+            setSceneNbr={setSceneNbr}
+            sceneNbr={sceneNbr}
+          />
+        )}
       </Canvas>
     </div>
   );
