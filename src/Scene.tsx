@@ -24,6 +24,7 @@ function Scene(props: SceneProps) {
   const carModel = useLoader(GLTFLoader, "./models/car-low.glb");
   const tunnelModel = useLoader(GLTFLoader, "./models/tunnel.glb");
   const camera = useThree((state: any) => state.camera);
+  const chassisRef = useRef<any>(null);
   const headlightsRef = useRef<any>(null);
   const brakelightsRef = useRef<any>(null);
   const [carColour, setCarColour] = useState<any>("hsl(0, 0%, 100%)");
@@ -38,6 +39,7 @@ function Scene(props: SceneProps) {
       });
     }
     if (node.name === "chassis" && node instanceof THREE.Mesh) {
+      chassisRef.current = node;
       node.material.color.set(carColour);
       node.material.roughness = 1.2;
       node.material.metalness = 0.8;
@@ -79,8 +81,7 @@ function Scene(props: SceneProps) {
     // const frameDetails = frames[0].points[currentFrame];
 
     const curve = new THREE.CatmullRomCurve3(path, false, "catmullrom", 0.1);
-
-    setCarColour(
+    chassisRef.current.material.color.set(
       `hsl(${(Math.sin(elapsedTime * 0.2) * 180 + 180) % 360}, 100%, 50%)`
     );
     if (video) {
