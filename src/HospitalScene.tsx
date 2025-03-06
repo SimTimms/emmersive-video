@@ -6,7 +6,7 @@ import { Vignette, EffectComposer, Bloom } from "@react-three/postprocessing";
 //import { Perf } from "r3f-perf";
 import * as THREE from "three";
 import { SoftShadows, useAnimations, Html } from "@react-three/drei";
-//import { Environment } from "@react-three/drei";
+import { Environment } from "@react-three/drei";
 
 interface HospitalSceneProps {
   setSceneNbr: any;
@@ -162,14 +162,14 @@ function HospitalScene(props: HospitalSceneProps) {
       </EffectComposer>
       <SoftShadows size={10} focus={1} samples={20} />
       {/*<Perf position="top-right" />*/}
-      {/*
+
       <Environment
         preset="forest"
         // can be true, false or "only" (which only sets the background) (default: false)
         environmentIntensity={0.8} // optional environment light intensity (default: 1)
         background={true} // optional background (default: true)
         backgroundBlurriness={0.5}
-      />*/}
+      />
       {/*
       <mesh
         rotation={[0, -Math.PI / 1.72, 0]}
