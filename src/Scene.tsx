@@ -13,16 +13,20 @@ import { Environment } from "@react-three/drei";
 import * as THREE from "three";
 
 interface SceneProps {
-  video: HTMLVideoElement | null;
-  path: THREE.Vector3[];
   setSceneNbr: any;
   sceneNbr: number;
+  videoRef: HTMLVideoElement;
 }
 function Scene(props: SceneProps) {
-  const { video, path, setSceneNbr, sceneNbr } = props;
+  const { setSceneNbr, sceneNbr, videoRef } = props;
+  const path = [new THREE.Vector3(0.5, 0, 4), new THREE.Vector3(0.1, 0, 4)];
 
-  const carModel = useLoader(GLTFLoader, "./models/car-low.glb");
-  const tunnelModel = useLoader(GLTFLoader, "./models/tunnel.glb");
+  const carModel = useLoader(GLTFLoader, "./models/car-low.glb", (loader) => {
+    loader.manager.onLoad = () => {
+      console.log("loaded");
+      videoRef.play();
+    };
+  });
   const camera = useThree((state: any) => state.camera);
   const chassisRef = useRef<any>(null);
   const headlightsRef = useRef<any>(null);
@@ -55,15 +59,6 @@ function Scene(props: SceneProps) {
     }
     node.castShadow = true;
   });
-  tunnelModel.scene.traverse(function (node) {
-    if (node instanceof THREE.Mesh) {
-      node.material.normalScale = { x: 0.05, y: 0.05 };
-      node.material.metalnessMap = null;
-      node.material.metalness = 0;
-      node.receiveShadow = true;
-      node.castShadow = true;
-    }
-  });
 
   const actions: { [key: number]: () => void } = {
     0: () => (headlightsRef.current.material.emissiveIntensity = 0),
@@ -78,17 +73,15 @@ function Scene(props: SceneProps) {
     }
     const elapsedTime = clock.getElapsedTime();
 
-    // const frameDetails = frames[0].points[currentFrame];
-
     const curve = new THREE.CatmullRomCurve3(path, false, "catmullrom", 0.1);
     chassisRef.current.material.color.set(
       `hsl(${(Math.sin(elapsedTime * 0.2) * 180 + 180) % 360}, 100%, 50%)`
     );
-    if (video) {
-      if (video.currentTime / video.duration >= 1 && sceneNbr === 0) {
+    if (videoRef) {
+      if (videoRef.currentTime / videoRef.duration >= 1 && sceneNbr === 0) {
         setSceneNbr(1);
       }
-      const position = curve.getPoint(video.currentTime / video.duration);
+      const position = curve.getPoint(videoRef.currentTime / videoRef.duration);
       camera.position.copy(position);
       camera.lookAt(position.x, position.y, position.z);
     }
