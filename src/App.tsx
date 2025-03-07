@@ -3,7 +3,6 @@ import { useEffect, useRef, useState, lazy, Suspense, useMemo } from "react";
 import lightson from "./assets/lights-on.mp3";
 import buzzing from "./assets/buzzing.mp3";
 import lightSwitch from "./assets/light-switch.mp3";
-import HospitalEquipmentScene from "./HospitalEquipment";
 import { OrbitControls } from "@react-three/drei";
 import { Vignette, EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Perf } from "r3f-perf";
@@ -14,6 +13,13 @@ import GUI from "lil-gui";
 const HospitalLightSwitch = lazy(() => import("./HospitalLightSwitch"));
 const DoctorScene = lazy(() => import("./DoctorScene"));
 const HospitalScene = lazy(() => import("./HospitalScene"));
+const HospitalEquipmentScene = lazy(() => import("./HospitalEquipment"));
+const HospitalEquipmentLod2Scene = lazy(
+  () => import("./HospitalEquipmentLod2")
+);
+const HospitalEquipmentLod3Scene = lazy(
+  () => import("./HospitalEquipmentLod3")
+);
 
 function App() {
   const [sceneNbr, setSceneNbr] = useState<number>(0);
@@ -26,6 +32,8 @@ function App() {
 
   const [gameConfig, setGameConfig] = useState({
     equipment: true,
+    equipmentLod2: true,
+    equipmentLod3: true,
     doctor: true,
     lightSwitch: true,
     room: true,
@@ -40,6 +48,12 @@ function App() {
     const debugFolder = gui.addFolder("Debug");
     debugFolder.add(gameConfig, "equipment").onChange((value: boolean) => {
       setGameConfig({ ...gameConfig, equipment: value });
+    });
+    debugFolder.add(gameConfig, "equipmentLod2").onChange((value: boolean) => {
+      setGameConfig({ ...gameConfig, equipmentLod2: value });
+    });
+    debugFolder.add(gameConfig, "equipmentLod3").onChange((value: boolean) => {
+      setGameConfig({ ...gameConfig, equipmentLod3: value });
     });
     debugFolder.add(gameConfig, "doctor").onChange((value: boolean) => {
       setGameConfig({ ...gameConfig, doctor: value });
@@ -96,6 +110,14 @@ function App() {
     return <HospitalEquipmentScene />;
   }, []);
 
+  const memoizedHospitalEquipmentLod2Scene = useMemo(() => {
+    return <HospitalEquipmentLod2Scene />;
+  }, []);
+
+  const memoizedHospitalEquipmentLod3Scene = useMemo(() => {
+    return <HospitalEquipmentLod3Scene />;
+  }, []);
+
   const memoizedDoctorScene = useMemo(() => {
     return <DoctorScene />;
   }, []);
@@ -129,7 +151,7 @@ function App() {
         {gameConfig.softShadows && (
           <SoftShadows size={10} focus={1} samples={20} />
         )}
-        <Perf position="top-left" />
+        <Perf position="top-left" showGraph deepAnalyze={true} />
 
         {gameConfig.environment && (
           <Environment
@@ -154,6 +176,16 @@ function App() {
             fallback={<Html style={{ background: "red" }}>loading...</Html>}
           >
             {gameConfig.equipment && memoizedHospitalEquipmentScene}
+          </Suspense>
+          <Suspense
+            fallback={<Html style={{ background: "red" }}>loading...</Html>}
+          >
+            {gameConfig.equipmentLod2 && memoizedHospitalEquipmentLod2Scene}
+          </Suspense>
+          <Suspense
+            fallback={<Html style={{ background: "red" }}>loading...</Html>}
+          >
+            {gameConfig.equipmentLod3 && memoizedHospitalEquipmentLod3Scene}
           </Suspense>
           <Suspense fallback={null}>
             {gameConfig.doctor && memoizedDoctorScene}
