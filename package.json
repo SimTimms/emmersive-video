@@ -13,6 +13,7 @@
     "@react-three/drei": "^10.0.3",
     "@react-three/fiber": "^9.0.4",
     "@react-three/postprocessing": "^3.0.4",
+    "lil-gui": "^0.20.0",
     "lucide-react": "^0.476.0",
     "r3f-perf": "^7.2.3",
     "react": "^19.0.0",
