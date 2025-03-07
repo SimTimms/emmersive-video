@@ -29,8 +29,8 @@ function App() {
     doctor: true,
     lightSwitch: true,
     room: true,
-    environment: false,
-    effects: false,
+    environment: true,
+    effects: true,
     softShadows: false,
   });
 
