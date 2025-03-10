@@ -1,26 +1,32 @@
-import { useRef, useMemo } from "react";
+import { useRef, useEffect, useState } from "react";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
-import { useLoader, useFrame } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 interface HospitalSceneProps {
-  setSceneNbr: any;
-  sceneNbr: number;
   audioRef: HTMLAudioElement | null;
-  currentStep: number;
-  setCurrentStep: any;
   isLightOn: boolean;
 }
 
 function HospitalScene(props: HospitalSceneProps) {
-  const { audioRef, currentStep, setCurrentStep, isLightOn } = props;
+  const { isLightOn } = props;
   const lightRef = useRef<any>(null);
   const lightModelRef = useRef<any>(null);
-  const hospitalModel = useLoader(GLTFLoader, "./models/hospital-room.glb");
+  const [hospitalModel, setHospitalModel] = useState<any>(null);
 
-  const memoizedHospitalScene = useMemo(() => {
-    hospitalModel.scene.traverse(function (node) {
+  useEffect(() => {
+    const loader = new GLTFLoader();
+    loader.load(
+      "./models/hospital-room.glb",
+      (gltf) => setHospitalModel(gltf.scene),
+      undefined,
+      (error) => console.error(error)
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!hospitalModel) return;
+    hospitalModel.traverse(function (node: any) {
       if (!(node instanceof THREE.Mesh)) return;
       if (
         node.name === "wall-1" ||
@@ -31,7 +37,7 @@ function HospitalScene(props: HospitalSceneProps) {
         const prevMaterial = node.material;
         prevMaterial.color = new THREE.Color("hsl(200, 30%, 70%)");
         prevMaterial.transparent = true;
-        prevMaterial.opacity = 0;
+        prevMaterial.opacity = 1;
         node.material = new THREE.MeshStandardMaterial();
 
         THREE.MeshBasicMaterial.prototype.copy.call(
@@ -72,7 +78,6 @@ function HospitalScene(props: HospitalSceneProps) {
         );
       }
     });
-    return hospitalModel;
   }, [hospitalModel]);
 
   useFrame((_, delta) => {
@@ -93,84 +98,6 @@ function HospitalScene(props: HospitalSceneProps) {
     }
   });
 
-  return (
-    <>
-      {memoizedHospitalScene.scene && (
-        <primitive object={memoizedHospitalScene.scene} />
-      )}
-
-      {currentStep === 0 && (
-        <group
-          position={[0.4, 1.4, -0.8]}
-          rotation={[0, -Math.PI / 0.5, 0]}
-          scale={0.5}
-        >
-          <Html>
-            <div
-              style={{
-                backgroundColor: "rgba(0,0,0,0.2)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                borderRadius: 10,
-                backdropFilter: "blur(20px)",
-                padding: 10,
-                color: "#fff",
-                textAlign: "center",
-                boxShadow: "10px 10px 10px 0 rgba(0,0,0,0.2)",
-                width: "20vh",
-              }}
-              onPointerDown={() => {
-                audioRef && audioRef.play();
-                setCurrentStep(1);
-              }}
-            >
-              <b>Task:</b> <br />
-              Talk to Dr Vandergraff
-            </div>
-          </Html>
-        </group>
-      )}
-      {currentStep === 1 && (
-        <group
-          position={[-2.4, 1.4, 0.8]}
-          rotation={[0, -Math.PI / 0.5, 0]}
-          scale={0.5}
-        >
-          <Html>
-            <div
-              style={{
-                backgroundColor: "rgba(0,0,0,0.2)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                borderRadius: 10,
-                backdropFilter: "blur(20px)",
-                padding: 10,
-                color: "#fff",
-                textAlign: "center",
-                boxShadow: "10px 10px 10px 0 rgba(0,0,0,0.2)",
-                width: "20vh",
-              }}
-              onPointerDown={() => {
-                audioRef && audioRef.play();
-                setCurrentStep(1);
-              }}
-            >
-              <b>Task:</b> <br />
-              Turn on Operating Lights
-            </div>
-          </Html>
-        </group>
-      )}
-
-      <directionalLight
-        ref={lightRef}
-        position={[-0.1, 0.8, -0.1]}
-        castShadow
-        intensity={0.8}
-        shadow-mapSize-height={1024}
-        shadow-mapSize-width={1024}
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-      />
-    </>
-  );
+  return hospitalModel && <primitive object={hospitalModel} />;
 }
 export default HospitalScene;

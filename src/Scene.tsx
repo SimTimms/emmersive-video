@@ -98,31 +98,12 @@ function Scene(props: SceneProps) {
         <Noise opacity={0.02} />
       </EffectComposer>
 
-      <Perf position="top-right" />
-
       <Environment
         preset="forest"
         // can be true, false or "only" (which only sets the background) (default: false)
         environmentIntensity={0.8} // optional environment light intensity (default: 1)
       />
 
-      {/*
-      <mesh rotation={[0, 0, 0]} position={[0, 10, -10.1]} scale={2}>
-        <planeGeometry args={[10.2, 20.2]} />
-        <meshStandardMaterial emissive={"white"} side={THREE.DoubleSide}>
-          <videoTexture
-            attach="map"
-            args={[video]}
-            colorSpace={THREE.SRGBColorSpace}
-          />
-          <videoTexture
-            attach="emissiveMap"
-            args={[video]}
-            colorSpace={THREE.SRGBColorSpace}
-          />
-        </meshStandardMaterial>
-      </mesh>
-      */}
       <group
         position={[0, -2.2, -5]}
         rotation={[0, -Math.PI / 0.5, 0]}

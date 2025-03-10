@@ -1,12 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
-import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAnimations } from "@react-three/drei";
 
 function DoctorScene() {
-  const doctor = useLoader(GLTFLoader, "./models/doctor.glb", () => {});
-  const doctorAnimations = useAnimations(doctor.animations, doctor.scene);
+  const [doctorModel, setDoctorModel] = useState<any>(null);
+  useEffect(() => {
+    const loader = new GLTFLoader();
+    loader.load(
+      "./models/doctor.glb",
+      (gltf) => {
+        setDoctorModel(gltf);
+      },
+      undefined,
+      (error) => console.error(error)
+    );
+  }, []);
+
+  const doctorAnimations = useAnimations(
+    doctorModel?.animations || [],
+    doctorModel?.scene
+  );
 
   useEffect(() => {
     if (!doctorAnimations) return;
@@ -15,16 +29,20 @@ function DoctorScene() {
     if (action) action.play();
   }, [doctorAnimations]);
 
-  doctor.scene.traverse(function (node) {
-    if (!(node instanceof THREE.Mesh)) return;
-    node.castShadow = true;
-  });
+  useEffect(() => {
+    if (!doctorModel) return;
+
+    doctorModel.scene.traverse(function (node: any) {
+      if (!(node instanceof THREE.Mesh)) return;
+      node.castShadow = true;
+    });
+  }, [doctorModel]);
 
   return (
     <>
-      {doctor.scene && (
+      {doctorModel && (
         <primitive
-          object={doctor.scene}
+          object={doctorModel.scene}
           scale={0.5}
           position={[0, 1.5, -1]}
           rotation={[0, -Math.PI / 1.6, 0]}

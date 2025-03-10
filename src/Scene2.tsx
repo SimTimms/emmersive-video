@@ -99,8 +99,6 @@ function Scene2(props: Scene2Props) {
         <Noise opacity={0.02} />
       </EffectComposer>
 
-      <Perf position="top-right" />
-
       <Environment
         preset="city"
         // can be true, false or "only" (which only sets the background) (default: false)

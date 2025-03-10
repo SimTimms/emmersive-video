@@ -6,10 +6,12 @@ import lightSwitch from "./assets/light-switch.mp3";
 import { OrbitControls } from "@react-three/drei";
 import { Vignette, EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Perf } from "r3f-perf";
-import { SoftShadows, Html } from "@react-three/drei";
+import { SoftShadows, Html, CubeCamera } from "@react-three/drei";
 import { Environment } from "@react-three/drei";
 import GUI from "lil-gui";
+import AppRender from "./AppRender";
 
+import LowResScene from "./LowResScene";
 const HospitalLightSwitch = lazy(() => import("./HospitalLightSwitch"));
 const DoctorScene = lazy(() => import("./DoctorScene"));
 const HospitalScene = lazy(() => import("./HospitalScene"));
@@ -87,16 +89,7 @@ function App() {
   }, [audioRef.current]);
 
   const memoizedHospitalScene = useMemo(() => {
-    return (
-      <HospitalScene
-        setSceneNbr={setSceneNbr}
-        sceneNbr={sceneNbr}
-        audioRef={audioRef.current}
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-        isLightOn={isLightOn}
-      />
-    );
+    return <HospitalScene audioRef={audioRef.current} isLightOn={isLightOn} />;
   }, [
     sceneNbr,
     currentStep,
@@ -137,10 +130,19 @@ function App() {
       <audio ref={audioRef} src={lightson} />
       <audio ref={buzzingRef} src={buzzing} loop />
       <audio ref={lightSwitchRef} src={lightSwitch} />
+      <AppRender />
       <Canvas
         className="canvas"
-        camera={{ fov: 45, position: [0, 2.8, -5], far: 800 }}
+        camera={{ fov: 90, position: [0, 2.8, -5], far: 800 }}
         shadows
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "0vw",
+          width: "100vw",
+          height: "100vh",
+          zIndex: -1,
+        }}
       >
         {gameConfig.effects && (
           <EffectComposer>
@@ -151,7 +153,6 @@ function App() {
         {gameConfig.softShadows && (
           <SoftShadows size={10} focus={1} samples={20} />
         )}
-        <Perf position="top-left" showGraph deepAnalyze={true} />
 
         {gameConfig.environment && (
           <Environment
